@@ -30,7 +30,7 @@ export default function Home() {
     const progressBar = useRef(null)
     const token = sessionStorage.getItem("token")
 
-    const {role,work,work_other,country,goals} = onBoardingForm
+    const {role,work,work_other,country,goals,tools} = onBoardingForm
 
     const handleChange = (e) =>{
         const {name,value,checked} = e.target
@@ -83,7 +83,17 @@ export default function Home() {
                 if(!role || !Object.values(work).includes(true)){
                     return prevCount
                 }
-            }else if(prevCount === 4){
+            }else if(prevCount === 2){
+                if(!country){
+                    return prevCount
+                }
+            }else if(prevCount === 3){
+                console.log(tools)
+                if(tools.length == 0 ){
+                    return prevCount
+                }
+            }
+            else if(prevCount === 4){
                 if(!Object.values(goals).includes(true)){
                     return prevCount
                 }
@@ -232,8 +242,7 @@ export default function Home() {
                     </div>
                 </div>
             
-                <div class="btn-group">
-                    {/* <button class="btn" onclick="validateStep1()">Continue</button> */}
+                <div className="btn-group">
                     <button className="btn2" onClick={nextStep}>Continue</button>
                 </div>
             </div>
@@ -320,7 +329,7 @@ export default function Home() {
                 <div className="form-group">
                     <label>Select your goals <span className="warning" id="goals-warning">Please select at least one option</span></label>
                     <div className="checkbox-group">
-                        <label class="checkbox-item">
+                        <label className="checkbox-item">
                             <input 
                                 type="checkbox" 
                                 name="goals" 
@@ -343,7 +352,7 @@ export default function Home() {
                                 type="checkbox" 
                                 name="goals" 
                                 value="Unused_duplicate_tools" 
-                                ckecked={goals.Unused_duplicate_tools}
+                                checked={goals.Unused_duplicate_tools}
                                 onChange={handleChange}
                                 /> Unused/duplicate tools
                         </label>
@@ -370,7 +379,6 @@ export default function Home() {
                 <p>Your Flowva library is ready to use. We'll take you to your dashboard now where you can start organizing your tools and tracking your productivity.</p>
             
                 <div className="btn-group">
-                    {/* <button className="btn" onclick="finishOnboarding()">Go to Dashboard</button> */}
                     <button className="btn2" onClick={openModal}>Go to Dashboard</button>
                 </div>
             </div>
@@ -378,7 +386,6 @@ export default function Home() {
             <div className={`${showModal && count >=5 ? 'completion-popup active' : "completion-popup"}`} id="completionPopup">
                 <h2>Onboarding Complete!</h2>
                 <p>Taking you to your dashboard now.</p>
-                {/* <button class="btn" onclick="closePopup()">OK</button> */}
                 <button className="btn2" onClick={closeModal}>OK</button>
             </div>
         </div>
