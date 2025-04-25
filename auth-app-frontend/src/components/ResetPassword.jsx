@@ -22,10 +22,12 @@ export default function ResetPassword() {
     const showMessage = (message,type) => {  
         setResetMessage(message)
         setMessageType(type)
-        setTimeout(() => {
-            setResetMessage("")
-            setMessageType("")
-        }, 3000);
+        if(!password || password.length < 8){
+            setTimeout(() => {
+                setResetMessage("")
+                setMessageType("")
+            }, 3000);
+        }
     }
 
     const handleSubmit = async (e) => {
@@ -47,6 +49,10 @@ export default function ResetPassword() {
             if(response.status === 200){
                 setPassword('')
                 showMessage(response.data.message, 'success')
+                setTimeout(() => {
+                    setResetMessage("")
+                    setMessageType("")
+                }, 3000);
             }
 
         }catch(err){
@@ -54,10 +60,14 @@ export default function ResetPassword() {
             if(err.response.status === 400){
                 showMessage(err.response.data.message, "error")
             }else if(err.response.status === 500){
-                showMessage("Internal server error", "error")
+                showMessage(err.response.data.message, "error")
             }else{
                 showMessage("Something went wrong", "error")
             }
+            setTimeout(() => {
+                setResetMessage("")
+                setMessageType("")
+            }, 3000);
         }
 
     }

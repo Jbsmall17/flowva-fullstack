@@ -11,20 +11,18 @@ export default function ForgotPassword() {
     const showMessage = (message,type) => {  
         setForgotPassMessage(message)
         setMessageType(type)
-        setTimeout(() => {
-            setForgotPassMessage("")
-            setMessageType("")
-        }, 3000);
+        if(!email){
+            setTimeout(() => {
+                setForgotPassMessage("")
+                setMessageType("")
+            }, 3000);
+        }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         if(!email){
             showMessage('Please enter your email', 'error')
-            return
-        }
-        if(!email.includes('@')){
-            showMessage('Please enter a valid email', 'error')
             return
         }
         try{
@@ -35,6 +33,10 @@ export default function ForgotPassword() {
             if(response.status === 200){
                 setEmail('')
                 showMessage(response.data.message, 'success')
+                setTimeout(() => {
+                    setForgotPassMessage("")
+                    setMessageType("")
+                }, 3000);
             }
         }catch(err){
             if(err.response.status === 400){
@@ -44,6 +46,10 @@ export default function ForgotPassword() {
             }else{
                 showMessage("Something went wrong", "error")
             }
+            setTimeout(() => {
+                setForgotPassMessage("")
+                setMessageType("")
+            }, 3000);
         }
 
     }

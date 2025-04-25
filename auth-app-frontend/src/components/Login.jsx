@@ -29,10 +29,12 @@ export default function Login() {
     const showMessage = (message,type) => {  
         setSignInMessage(message)
         setMessageType(type)
-        setTimeout(() => {
-            setSignInMessage("")
-            setMessageType("")
-        }, 3000);
+        if(!email || !password){
+            setTimeout(() => {
+                setSignInMessage("")
+                setMessageType("")
+            }, 3000);
+        }
     }
 
     const handleSubmit = async(e) => {
@@ -56,22 +58,20 @@ export default function Login() {
                     password: ""
                 })
                 navigate("/")
-                // setTimeout(()=>{
-                // },500)
             }
         }catch(err){
             if(err.response.status === 400){
                 showMessage(err.response.data.message, "error")
             }else if(err.response.status === 500){
-                showMessage("Internal server error", "error")
+                showMessage(err.response.data.message, "error")
             }else{
                 showMessage("Something went wrong", "error")
             }
+            setTimeout(() => {
+                setSignInMessage("")
+                setMessageType("")
+            }, 3000);
         }
-
-        // console.log('user details', sigInObj)
-        // showMessage('Signing in...', 'success');
-
     }
 
   return ( 

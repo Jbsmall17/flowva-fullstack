@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 export default function Signup() {
     const navigate = useNavigate()
     const apiUrl = import.meta.env.VITE_API_URL
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/;
     const [signUpObj,setSignUpObj] = useState({
         email: "",
         password: "",
@@ -31,10 +32,12 @@ export default function Signup() {
     const showMessage = (message,type) => {  
         setSignUpMessage(message)
         setMessageType(type)
-        setTimeout(() => {
-            setSignUpMessage("")
-            setMessageType("")
-        }, 3000);
+        if(!email || !password || !confirmPassword || password !== confirmPassword || password.length < 8|| !passwordRegex.test(password)){
+            setTimeout(() => {
+                setSignUpMessage("")
+                setMessageType("")
+            }, 3000);
+        }
     }
 
     const handleSubmit = async(e) => {
@@ -50,6 +53,10 @@ export default function Signup() {
         if(password.length < 8){
             showMessage("Password must be at least 8 characters","error")
             return
+        }
+        if(!passwordRegex.test(password)){
+            showMessage("Password must contain at least one letter, one number and one special character","error")
+            return  
         }
         try{
             showMessage('Creating your account...', 'success');
@@ -73,14 +80,15 @@ export default function Signup() {
             if(err.response.status === 400){
                 showMessage(err.response.data.message, "error")
             }else if(err.response.status === 500){
-                showMessage("Internal server error", "error")
+                showMessage(err.response.data.message, "error")
             }else{
                 showMessage("Something went wrong", "error")
             }
+            setTimeout(() => {
+                setSignUpMessage("")
+                setMessageType("")
+            }, 3000);
         }
-
-        // showMessage('Creating your account...', 'success');
-        // console.log("user details", signUpObj)
     }
 
 
