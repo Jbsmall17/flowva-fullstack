@@ -7,6 +7,9 @@ const path = require("path")
 const fs = require("fs")
 const bcrypt = require("bcrypt")
 require("dotenv").config()
+const {OAuth2Client} = require("google-auth-library")
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+
 
 const JWT_SECRET = process.env.JWT_SECRET
 const authRouter = express.Router()
@@ -169,6 +172,48 @@ authRouter.post(
             res.status(200).json({
                 message: "Password reset successfully"
             })
+        }catch(err){
+            return res.status(500).json({
+                message: "Internal server error"
+            })
+        }
+    }
+)
+
+authRouter.post(
+    "/google-login",
+    async(req,res)=>{
+        try{
+            const {idToken} = req.body
+            const ticket = await client.verifyIdToken({
+                idToken,
+                audience: process.env.GOOGLE_CLIENT_ID
+            })
+            const {email} = ticket.getPayload()
+            const user = await userModel.findOne({email})
+            if(!user){
+                const newUser = await userModel.create({
+                    email,
+                    password: email + process.env.GOOGLE_CLIENT_ID
+                })
+                const token = jwt.sign(
+                    {email: newUser.email,userId: newUser._id}, 
+                    JWT_SECRET, {expiresIn: "1h"}
+                )
+                return res.status(200).json({
+                    message: "User logged in successfully",
+                    token
+                })
+            }else{
+                const token = jwt.sign(
+                    {email: user.email,userId: user._id}, 
+                    JWT_SECRET, {expiresIn: "1h"}
+                )
+                return res.status(200).json({
+                    message: "User logged in successfully",
+                    token
+                })
+            }
         }catch(err){
             return res.status(500).json({
                 message: "Internal server error"
